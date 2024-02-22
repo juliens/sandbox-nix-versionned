@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"slices"
 )
 
@@ -24,7 +25,7 @@ func Api(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		showDirectoryStructure(rw, dir)
+		showDirectoryStructure(rw, dir, "..")
 
 		http.Error(rw, "can't find cache file", http.StatusInternalServerError)
 		return
@@ -60,16 +61,17 @@ func Api(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusMovedPermanently)
 }
 
-func showDirectoryStructure(rw http.ResponseWriter, dir []os.DirEntry) {
+func showDirectoryStructure(rw http.ResponseWriter, dir []os.DirEntry, previousDir string) {
 	for _, entry := range dir {
+		join := path.Join(previousDir, entry.Name())
 		if entry.IsDir() {
-			newDir, err := os.ReadDir("../" + entry.Name())
+			newDir, err := os.ReadDir(join)
 			if err != nil {
 				rw.Write([]byte(err.Error() + "\n"))
 			}
-			showDirectoryStructure(rw, newDir)
+			showDirectoryStructure(rw, newDir, join)
 		} else {
-			rw.Write([]byte(fmt.Sprintf("%s\n", entry.Name())))
+			rw.Write([]byte(fmt.Sprintf("%s\n", join)))
 		}
 	}
 }
