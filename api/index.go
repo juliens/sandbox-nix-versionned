@@ -18,7 +18,7 @@ func Api(rw http.ResponseWriter, req *http.Request) {
 	file, err := os.ReadFile("./all.json")
 	if err != nil {
 
-		dir, err := os.ReadDir("./")
+		dir, err := os.ReadDir("../")
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
