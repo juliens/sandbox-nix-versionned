@@ -15,8 +15,19 @@ type pkg struct {
 func Api(rw http.ResponseWriter, req *http.Request) {
 	pkgs := map[string]pkg{}
 
-	file, err := os.ReadFile("../all.json")
+	file, err := os.ReadFile("./all.json")
 	if err != nil {
+
+		dir, err := os.ReadDir("./")
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for name, entry := range dir {
+			rw.Write([]byte(fmt.Sprintf("%s => %v", name, entry)))
+		}
+
 		http.Error(rw, "can't find cache file", http.StatusInternalServerError)
 		return
 	}
