@@ -1,10 +1,10 @@
 package handler
 
 import (
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"slices"
 )
 
@@ -12,13 +12,16 @@ type pkg struct {
 	Versions map[string]string
 }
 
-//go:embed all.json
-var all []byte
-
 func Api(rw http.ResponseWriter, req *http.Request) {
 	pkgs := map[string]pkg{}
 
-	err := json.Unmarshal(all, &pkgs)
+	file, err := os.ReadFile("../all.json")
+	if err != nil {
+		http.Error(rw, "can't find cache file", http.StatusInternalServerError)
+		return
+	}
+
+	err = json.Unmarshal(file, &pkgs)
 	if err != nil {
 		http.Error(rw, "can't unmarshal cache file", http.StatusInternalServerError)
 		return
