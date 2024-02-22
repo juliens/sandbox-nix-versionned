@@ -61,3 +61,18 @@ func Api(rw http.ResponseWriter, req *http.Request) {
 
 	rw.WriteHeader(http.StatusMovedPermanently)
 }
+
+func showDirectoryStructure(rw http.ResponseWriter, dir []os.DirEntry) {
+	for _, entry := range dir {
+		if entry.IsDir() {
+			newDir, err := os.ReadDir(entry.Name())
+			if err != nil {
+				rw.Write([]byte(err.Error() + "<br />"))
+				return
+			}
+			showDirectoryStructure(rw, newDir)
+		} else {
+			rw.Write([]byte(fmt.Sprintf("%s<br />", entry.Name())))
+		}
+	}
+}
