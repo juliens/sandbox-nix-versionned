@@ -24,9 +24,7 @@ func Api(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		for name, entry := range dir {
-			rw.Write([]byte(fmt.Sprintf("%s => %v", name, entry)))
-		}
+		showDirectoryStructure(rw, dir)
 
 		http.Error(rw, "can't find cache file", http.StatusInternalServerError)
 		return
