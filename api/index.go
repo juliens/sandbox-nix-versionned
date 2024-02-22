@@ -63,14 +63,13 @@ func Api(rw http.ResponseWriter, req *http.Request) {
 func showDirectoryStructure(rw http.ResponseWriter, dir []os.DirEntry) {
 	for _, entry := range dir {
 		if entry.IsDir() {
-			newDir, err := os.ReadDir(entry.Name())
+			newDir, err := os.ReadDir("../" + entry.Name())
 			if err != nil {
-				rw.Write([]byte(err.Error() + "<br />"))
-				return
+				rw.Write([]byte(err.Error() + "\n"))
 			}
 			showDirectoryStructure(rw, newDir)
 		} else {
-			rw.Write([]byte(fmt.Sprintf("%s<br />", entry.Name())))
+			rw.Write([]byte(fmt.Sprintf("%s\n", entry.Name())))
 		}
 	}
 }
