@@ -45,8 +45,9 @@ type Pkg struct {
 }
 
 type Version struct {
-	Commit string `json:"Commit"`
-	Lock   string `json:"lock"`
+	Commit  string `json:"Commit"`
+	Lock    string `json:"lock"`
+	Version string `json:"-"`
 }
 
 func (n *Nix) Packages(ctx context.Context, commit string) (map[string]Pkg, error) {

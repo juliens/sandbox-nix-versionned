@@ -11,6 +11,7 @@ func main() {
 
 	mux := &http.ServeMux{}
 	mux.HandleFunc("/binary", handlers.Binary)
-	mux.HandleFunc("/devShell", handlers.DevShell)
+	mux.HandleFunc("/flake", handlers.Flake)
+	mux.HandleFunc("/devshell", handlers.DevShell)
 	log.Fatal(http.ListenAndServe(":8092", mux))
 }

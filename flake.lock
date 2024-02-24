@@ -3,13 +3,13 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "narHash": "sha256-hWA2BcmCym7bYRS2MnvnNwbF56VOEnXgT/KUfdqWkY4=",
+        "narHash": "sha256-Z5gFBqIWnp6llz5yt1bCFtQ/v4UcjaKUoCHwYkUcZxA=",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/e3ca01dedc1e.zip"
+        "url": "https://github.com/NixOS/nixpkgs/archive/dfccc488dbbc.zip"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/e3ca01dedc1e.zip"
+        "url": "https://github.com/NixOS/nixpkgs/archive/dfccc488dbbc.zip"
       }
     },
     "root": {

@@ -11,9 +11,11 @@ import (
 	"io"
 	"os"
 	"slices"
+	"sort"
 	"strings"
 	"sync"
 
+	"github.com/Masterminds/semver"
 	"github.com/juliens/sandbox-nix-versionned/pkg/nix"
 )
 
@@ -156,11 +158,35 @@ func (f *Foo) GetPackageVersionned(pkgName, version string) (nix.Version, error)
 
 	toReturn, ok := pkgVersions.Versions[version]
 	if !ok {
-		versions := []string{}
-		for v := range pkgVersions.Versions {
-			versions = append(versions, v)
+		versions := semver.Collection{}
+		oldVersions := map[*semver.Version]nix.Version{}
+		for v, value := range pkgVersions.Versions {
+			newVersion, err := semver.NewVersion(v)
+			if err != nil {
+				continue
+			}
+			value.Version = v
+			oldVersions[newVersion] = value
+			versions = append(versions, newVersion)
 		}
-		slices.Sort(versions)
+
+		sort.Sort(versions)
+		slices.Reverse(versions)
+		c, err := semver.NewConstraint(version)
+		if err != nil {
+			return nix.Version{}, err
+		}
+
+		if pkgName == "kubectl" {
+			fmt.Println(versions)
+		}
+		for _, v := range versions {
+			if c.Check(v) {
+				fmt.Println("Selected version", pkgName, v.String())
+				return oldVersions[v], nil
+			}
+		}
+
 		return nix.Version{}, fmt.Errorf("version not found %v", versions)
 	}
 
@@ -196,7 +222,7 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		inputs = append(inputs, binaryName+".url=\""+f.getFlakeUrl(ver)+"\";")
+		inputs = append(inputs, binaryName+".url=\""+f.getFlakeUrl(ver)+"\"; # "+pkgName+" - "+ver.Version)
 		pkgs = append(pkgs, "inputs."+binaryName+".legacyPackages.${system}."+pkgName)
 	}
 	template := `{
