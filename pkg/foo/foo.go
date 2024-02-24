@@ -190,6 +190,7 @@ func (f *Foo) GetPackageVersionned(pkgName, version string) (nix.Version, error)
 		return nix.Version{}, fmt.Errorf("version not found %v", versions)
 	}
 
+	toReturn.Version = version
 	return toReturn, nil
 }
 
