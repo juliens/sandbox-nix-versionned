@@ -1,5 +1,5 @@
 { lib }:
 let
-  packages=builtins.fromJSON  (builtins.readFile ../all.json);
+  Packages=builtins.fromJSON  (builtins.readFile ../all.json);
 in
-  name: version: let hash=packages.${name}.versions.${version}; in "github:nixos/nixpkgs/${hash}"
+  name: version: let hash=Packages.${name}.versions.${version}; in "github:nixos/nixpkgs/${hash}"

@@ -1,16 +1,24 @@
+
 {
-  description="test";
-  inputs = 
-  #packages=builtins.fromJSON  (builtins.readFile ./all.json);
-  #name="go";
-  #version="1.20.3";
-  #gohash=packages.${name}.versions.${version};
-  {
+  description = "Test";
+  inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    #gopkgs.url =  "github:nixos/nixpkgs/${gohash}";
-    gopkgs.url =  "github:nixos/nixpkgs/80f198ff3a65";
+    go.url = "https://github.com/NixOS/nixpkgs/archive/e3ca01dedc1e.zip";
   };
-  outputs = {self, nixpkgs, gopkgs}: {
-    packages.x86_64-linux.default=gopkgs.legacyPackages.x86_64-linux.go;
+  outputs = {nixpkgs,...}:
+  let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+    };
+  in
+  {
+    packages.${system}.default = nixpkgs.legacyPackages.${system}.go_1_25;
+    devShells.${system}.default = pkgs.mkShell {
+      packages = [
+        go.${system}.go_1_21
+      ];
+    };
   };
 }
