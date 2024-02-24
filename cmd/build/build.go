@@ -29,7 +29,7 @@ var previous *foo.Foo
 
 func main() {
 	var err error
-	previous, err = foo.New("./all.json")
+	previous, err = foo.New("./pkg/foo/all.json")
 	if err != nil {
 		log.Fatal(err)
 	}
