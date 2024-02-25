@@ -134,7 +134,7 @@ func (f *Foo) GetPackageVersionnedFlakeURL(pkgName, version string) (string, err
 }
 
 func (f *Foo) getFlakeUrl(version nix.Version) string {
-	return "https://github.com/NixOS/nixpkgs/archive/" + version.Commit + ".zip"
+	return "https://github.com/NixOS/nixpkgs/archive/" + version.Commit + ".tar.gz"
 }
 
 func (f *Foo) GetBinaryVersionnedFlakeURL(binaryName, version string) (string, error) {
@@ -223,18 +223,20 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		inputs = append(inputs, binaryName+".url=\""+f.getFlakeUrl(ver)+"\"; # "+pkgName+" - "+ver.Version)
-		pkgs = append(pkgs, "inputs."+binaryName+".legacyPackages.${system}."+pkgName)
+		inputs = append(inputs, "    "+binaryName+".url=\""+f.getFlakeUrl(ver)+"\"; # "+pkgName+" - "+ver.Version)
+		pkgs = append(pkgs, "    inputs."+binaryName+".legacyPackages.${system}."+pkgName)
 	}
 	template := `{
   description = "Test";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+
     ` + strings.Join(inputs, "\n") + `
   };
-  outputs = inputs @ {nixpkgs,...}:
+  outputs = inputs @ {nixpkgs, flake-utils,...}:
+  flake-utils.lib.eachDefaultSystem (system: let
   let
-    system = "x86_64-linux";
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
@@ -246,7 +248,7 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
         ` + strings.Join(pkgs, "\n") + `
       ];
     };
-  };
+  });
 }
 `
 	return []byte(template), nil
@@ -276,11 +278,11 @@ func (f *Foo) GetBinaryFlakeTarGz(rw io.Writer, binaryName, version string) ([]b
       "locked": {
         "narHash": "` + ver.Lock + `",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/` + ver.Commit + `.zip"
+        "url": "` + f.getFlakeUrl(ver) + `"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/` + ver.Commit + `.zip"
+        "url": "` + f.getFlakeUrl(ver) + `"
       }
     },
     "root": {

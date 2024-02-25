@@ -45,7 +45,9 @@ func main() {
 	go func() {
 		var handled int
 		var average time.Duration
+		var buf int
 		for val := range outCh {
+			buf++
 			handled++
 			log.Printf("%d handled / %d sent\n", handled, count)
 			if errors.Is(val.err, context.Canceled) {
@@ -65,7 +67,10 @@ func main() {
 			previous.AddCommit(val.commit, val.err)
 			previous.Merge(val.packages)
 
-			err = previous.Write()
+			if buf > 10 {
+				err = previous.Write()
+				buf = 0
+			}
 			if err != nil {
 				log.Printf("Error while writing file: %v", err)
 			}
