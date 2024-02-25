@@ -242,7 +242,7 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
     };
   in
   {
-    devShells.${system}.default = pkgs.mkShell {
+    devShells.default = pkgs.mkShell {
       packages = [
         ` + strings.Join(pkgs, "\n") + `
       ];
@@ -267,8 +267,13 @@ func (f *Foo) GetBinaryFlakeTarGz(rw io.Writer, binaryName, version string) ([]b
 	};
 	outputs = {nixpkgs,...}:
 	flake-utils.lib.eachDefaultSystem (system: let
+	  pkgs = import nixpkgs {
+        inherit system;
+       config.allowUnfree = true;
+      };
+	in
 	{
-		packages.${system}.default = nixpkgs.legacyPackages.${system}.` + pkgName + `;
+		packages.default = pkgs.` + pkgName + `;
 	});
 }
 `
