@@ -236,7 +236,6 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
   };
   outputs = inputs @ {nixpkgs, flake-utils,...}:
   flake-utils.lib.eachDefaultSystem (system: let
-  let
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
