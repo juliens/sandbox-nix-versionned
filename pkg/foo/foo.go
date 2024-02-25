@@ -263,11 +263,14 @@ func (f *Foo) GetBinaryFlakeTarGz(rw io.Writer, binaryName, version string) ([]b
 {
 	description = "Test";
 	inputs = {
+		flake-utils.url = "github:numtide/flake-utils";
 		nixpkgs.url = "` + f.getFlakeUrl(ver) + `";
 	};
-	outputs = {nixpkgs,...}:{
-		packages.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.` + pkgName + `;
-	};
+	outputs = {nixpkgs,...}:
+	flake-utils.lib.eachDefaultSystem (system: let
+	{
+		packages.${system}.default = nixpkgs.legacyPackages.${system}.` + pkgName + `;
+	});
 }
 `
 
