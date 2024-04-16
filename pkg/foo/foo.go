@@ -223,6 +223,11 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+		if version == "*" {
+			pkgs = append(pkgs, pkgName)
+			continue
+		}
+
 		inputs = append(inputs, "    "+binaryName+".url=\""+f.getFlakeUrl(ver)+"\"; # "+pkgName+" - "+ver.Version)
 		pkgs = append(pkgs, "    inputs."+binaryName+".legacyPackages.${system}."+pkgName)
 	}
@@ -243,8 +248,8 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
   in
   {
     devShells.default = pkgs.mkShell {
-      packages = [
-        ` + strings.Join(pkgs, "\n") + `
+      packages = with pkgs; [
+        ` + strings.Join(pkgs, "\n        ") + `		
       ];
     };
   });
