@@ -7,6 +7,12 @@ import (
 	"github.com/juliens/sandbox-nix-versionned/pkg/foo"
 )
 
+type DevShellConfig struct {
+	Name     string            `json:"name"`
+	Nixpkgs  string            `json:"nixpkgs"`
+	Packages map[string]string `json:"packages"`
+}
+
 func DevShell(rw http.ResponseWriter, req *http.Request) {
 	n, err := foo.NewInternal()
 	if err != nil {
@@ -15,12 +21,14 @@ func DevShell(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	decoder := json.NewDecoder(req.Body)
-	binaries := map[string]string{}
-	decoder.Decode(&binaries)
+	binaries := DevShellConfig{}
+	err = decoder.Decode(&binaries)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	nixpkgs := req.FormValue("nixpkgs")
-
-	flake, err := n.GetDevShellFlakeFile(binaries, nixpkgs)
+	flake, err := n.GetDevShellFlakeFile(binaries)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusNotFound)
 		return

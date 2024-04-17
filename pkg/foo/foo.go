@@ -16,6 +16,7 @@ import (
 	"sync"
 
 	"github.com/Masterminds/semver"
+	"github.com/juliens/sandbox-nix-versionned/pkg/handlers"
 	"github.com/juliens/sandbox-nix-versionned/pkg/nix"
 )
 
@@ -214,14 +215,18 @@ func (f *Foo) GetBinaryVersionned(binaryName, ver string) (string, nix.Version, 
 	return "", nix.Version{}, fmt.Errorf("%s version %s not found", binaryName, ver)
 }
 
-func (f *Foo) GetDevShellFlakeFile(binaries map[string]string, nixpkgs string) ([]byte, error) {
-	if nixpkgs == "" {
-		nixpkgs = "github.com:nixos/nixpkgs"
+func (f *Foo) GetDevShellFlakeFile(config handlers.DevShellConfig) ([]byte, error) {
+	if config.Nixpkgs == "" {
+		config.Nixpkgs = "github.com:nixos/nixpkgs"
+	}
+
+	if config.Name == "" {
+		config.Name = "devshell"
 	}
 
 	var inputs []string
 	var pkgs []string
-	for binaryName, version := range binaries {
+	for binaryName, version := range config.Packages {
 		pkgName, ver, err := f.GetBinaryVersionned(binaryName, version)
 		if err != nil {
 			return nil, err
@@ -235,9 +240,9 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string, nixpkgs string) (
 		pkgs = append(pkgs, "    inputs."+binaryName+".legacyPackages.${system}."+pkgName)
 	}
 	template := `{
-  description = "Test";
+  description = "` + config.Name + `";
   inputs = {
-    nixpkgs.url = "` + nixpkgs + `";
+    nixpkgs.url = "` + config.Nixpkgs + `";
     flake-utils.url = "github:numtide/flake-utils";
 
     ` + strings.Join(inputs, "\n") + `

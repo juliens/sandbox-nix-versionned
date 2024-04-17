@@ -3,4 +3,19 @@
 ## devShell
 
 
-![demo](https://github.com/juliens/sandbox-nix-versionned/assets/195661/aee33583-ca3d-460a-ac94-8d21eb9198f0)
+```
+{
+    "name":"my devshell",
+    "nixpkgs":"github:nixos/nixpkgs",
+    "packages": {
+        "jq":"*",
+        "go":"1.20.*",
+        ...
+    }
+}
+```
+
+```
+curl -d@env.json https://nix.juguul.ovh/api/devshell -o flake.nix
+```
+

@@ -97,7 +97,7 @@ func startWorkers(ctx context.Context, nb int, inCh chan string, outCh chan out)
 }
 
 func parser(ctx context.Context, inCh chan string, outCh chan out) {
-	n := nix.NewNix("/home/juliens/dev/nixpkgs")
+	n := nix.NewNix("/Users/juliensalleyron/dev/nixpkgs")
 
 	for commit := range inCh {
 		if previous.ContainsCommit(commit) {
