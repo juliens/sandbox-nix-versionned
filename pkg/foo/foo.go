@@ -16,9 +16,14 @@ import (
 	"sync"
 
 	"github.com/Masterminds/semver"
-	"github.com/juliens/sandbox-nix-versionned/pkg/handlers"
 	"github.com/juliens/sandbox-nix-versionned/pkg/nix"
 )
+
+type DevShellConfig struct {
+	Name     string            `json:"name"`
+	Nixpkgs  string            `json:"nixpkgs"`
+	Packages map[string]string `json:"packages"`
+}
 
 //go:embed all.json
 var b []byte
@@ -215,7 +220,7 @@ func (f *Foo) GetBinaryVersionned(binaryName, ver string) (string, nix.Version, 
 	return "", nix.Version{}, fmt.Errorf("%s version %s not found", binaryName, ver)
 }
 
-func (f *Foo) GetDevShellFlakeFile(config handlers.DevShellConfig) ([]byte, error) {
+func (f *Foo) GetDevShellFlakeFile(config DevShellConfig) ([]byte, error) {
 	if config.Nixpkgs == "" {
 		config.Nixpkgs = "github.com:nixos/nixpkgs"
 	}
