@@ -244,6 +244,10 @@ func (f *Foo) GetDevShellFlakeFile(config DevShellConfig) ([]byte, error) {
 		inputs = append(inputs, "    "+binaryName+".url=\""+f.getFlakeUrl(ver)+"\"; # "+pkgName+" - "+ver.Version)
 		pkgs = append(pkgs, "    inputs."+binaryName+".legacyPackages.${system}."+pkgName)
 	}
+
+	slices.Sort(inputs)
+	slices.Sort(pkgs)
+
 	template := `{
   description = "` + config.Name + `";
   inputs = {
