@@ -214,7 +214,10 @@ func (f *Foo) GetBinaryVersionned(binaryName, ver string) (string, nix.Version, 
 	return "", nix.Version{}, fmt.Errorf("%s version %s not found", binaryName, ver)
 }
 
-func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
+func (f *Foo) GetDevShellFlakeFile(binaries map[string]string, nixpkgs string) ([]byte, error) {
+	if nixpkgs == "" {
+		nixpkgs = "github.com:nixos/nixpkgs"
+	}
 
 	var inputs []string
 	var pkgs []string
@@ -234,7 +237,7 @@ func (f *Foo) GetDevShellFlakeFile(binaries map[string]string) ([]byte, error) {
 	template := `{
   description = "Test";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "` + nixpkgs + `";
     flake-utils.url = "github:numtide/flake-utils";
 
     ` + strings.Join(inputs, "\n") + `

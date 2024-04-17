@@ -18,7 +18,9 @@ func DevShell(rw http.ResponseWriter, req *http.Request) {
 	binaries := map[string]string{}
 	decoder.Decode(&binaries)
 
-	flake, err := n.GetDevShellFlakeFile(binaries)
+	nixpkgs := req.FormValue("nixpkgs")
+
+	flake, err := n.GetDevShellFlakeFile(binaries, nixpkgs)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusNotFound)
 		return
